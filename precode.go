@@ -42,6 +42,8 @@ func Worker(in <-chan int64, out chan<- int64) {
 	}
 }
 
+var mu sync.Mutex
+
 func main() {
 	chIn := make(chan int64)
 
@@ -55,8 +57,10 @@ func main() {
 	// генерируем числа, считая параллельно их количество и сумму
 
 	go Generator(ctx, chIn, func(i int64) {
+		mu.Lock()
 		inputSum += i
 		inputCount++
+		mu.Unlock()
 	})
 
 	const NumOut = 5 // количество обрабатывающих горутин и каналов
